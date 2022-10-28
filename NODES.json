@@ -1,0 +1,20 @@
+{
+    "1": {
+        "NAME": "Headphones",
+        "BG_COLOR": "#454545",
+        "TXT_COLOR": "#fff",
+        "SIZE": "1",
+        "COORDS": [100, 200],
+        "MAX_AMT": 4000,
+        "PRESENT_AMT": 700
+    },
+    "2": {
+        "NAME": "PS5",
+        "BG_COLOR": "#fff",
+        "TXT_COLOR": "#000000",
+        "SIZE": "1",
+        "COORDS": [300, 200],
+        "MAX_AMT": 4000,
+        "PRESENT_AMT": 700
+    }
+}
