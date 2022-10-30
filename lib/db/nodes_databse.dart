@@ -37,7 +37,6 @@ class NodesDatabase {
       ${NodeFields.bg_color} $stringType,
       ${NodeFields.txt_color} $stringType,
       ${NodeFields.size} $stringType,
-      ${NodeFields.coords} $listType,
       ${NodeFields.max_amt} $intType,
       ${NodeFields.present_amt} $intType
 
@@ -50,5 +49,14 @@ class NodesDatabase {
   Future close() async {
     final db = await instance.database;
     db.close();
+  }
+
+  // '''     CRUD       '''
+
+  Future<Node> create(Node node) async {
+    final db = await instance.database;
+
+    final id = await db.insert(tableNodes, node.toJson());
+    return node.copy();
   }
 }
