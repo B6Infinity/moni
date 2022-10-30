@@ -57,6 +57,32 @@ class NodesDatabase {
     final db = await instance.database;
 
     final id = await db.insert(tableNodes, node.toJson());
-    return node.copy();
+    return node.copy(id: id);
+  }
+
+  Future<Node?> readNode(int id) async {
+    final db = await instance.database;
+
+    final maps = await db.query(
+      tableNodes,
+      columns: NodeFields.values,
+      where: '${NodeFields.id} = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return Node.fromJson(maps.first);
+    } else {
+      // throw Exception('Node $id not found');
+      return null;
+    }
+  }
+
+  Future<List<Node>> readAllNodes() async {
+    final db = await instance.database;
+
+    final result = await db.query(tableNodes);
+    return result.map((json) => Node.fromJson(json)).toList();
+    // ORDER BY　とか ??
   }
 }

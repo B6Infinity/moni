@@ -3,6 +3,11 @@
 const String tableNodes = 'nodes';
 
 class NodeFields {
+  static final List<String> values = [
+    // All Fields
+    id, name, bg_color, txt_color, size, max_amt, present_amt
+  ];
+
   static const String id = '_id';
   static const String name = 'name';
   static const String bg_color = 'bg_color';
@@ -40,6 +45,15 @@ class Node {
         NodeFields.max_amt: max_amt,
         NodeFields.present_amt: present_amt
       };
+
+  static Node fromJson(Map<String, Object?> json) => Node(
+        name: json[NodeFields.name] as String,
+        bg_color: json[NodeFields.bg_color] as String,
+        txt_color: json[NodeFields.txt_color] as String,
+        size: json[NodeFields.size] as int,
+        max_amt: json[NodeFields.max_amt] as int,
+        present_amt: json[NodeFields.present_amt] as int,
+      );
 
   Node copy({
     int? id,
