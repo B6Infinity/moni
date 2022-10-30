@@ -83,6 +83,27 @@ class NodesDatabase {
 
     final result = await db.query(tableNodes);
     return result.map((json) => Node.fromJson(json)).toList();
-    // ORDER BY　とか ??
+    // ORDER BY　とか ?? https://youtu.be/UpKrhZ0Hppk?t=1189
+  }
+
+  Future<int> updateNode(Node node) async {
+    final db = await instance.database;
+
+    return db.update(
+      tableNodes,
+      node.toJson(),
+      where: '${NodeFields.id} = ?',
+      whereArgs: [node.id],
+    );
+  }
+
+  Future<int> deleteNode(int id) async {
+    final db = await instance.database;
+
+    return await db.delete(
+      tableNodes,
+      where: '${NodeFields.id} = ?',
+      whereArgs: [id],
+    );
   }
 }
