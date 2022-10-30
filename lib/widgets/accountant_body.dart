@@ -19,6 +19,7 @@ class _AccountantBodyState extends State<AccountantBody> {
   Widget build(BuildContext context) {
     for (var node in widget.NODES) {
       print(node.id);
+      // TODO: ID is null fix it!
     }
     return const Text('data:');
   }
