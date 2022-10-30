@@ -35,7 +35,6 @@ class _AccountantState extends State<Accountant> {
     setState(() => isLoading = true);
 
     NODES = await NodesDatabase.instance.readAllNodes();
-    print('STUCK?');
 
     setState(() => isLoading = false);
   }

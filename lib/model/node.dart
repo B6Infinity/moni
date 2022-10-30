@@ -46,14 +46,16 @@ class Node {
         NodeFields.present_amt: present_amt
       };
 
-  static Node fromJson(Map<String, Object?> json) => Node(
-        name: json[NodeFields.name] as String,
-        bg_color: json[NodeFields.bg_color] as String,
-        txt_color: json[NodeFields.txt_color] as String,
-        size: json[NodeFields.size] as int,
-        max_amt: json[NodeFields.max_amt] as int,
-        present_amt: json[NodeFields.present_amt] as int,
-      );
+  static Node fromJson(Map<String, Object?> json) {
+    return Node(
+      name: json[NodeFields.name] as String,
+      bg_color: json[NodeFields.bg_color] as String,
+      txt_color: json[NodeFields.txt_color] as String,
+      size: int.parse(json[NodeFields.size] as String),
+      max_amt: json[NodeFields.max_amt] as int,
+      present_amt: json[NodeFields.present_amt] as int,
+    );
+  }
 
   Node copy({
     int? id,

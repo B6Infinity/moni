@@ -17,7 +17,9 @@ class AccountantBody extends StatefulWidget {
 class _AccountantBodyState extends State<AccountantBody> {
   @override
   Widget build(BuildContext context) {
-    print(widget.NODES);
+    for (var node in widget.NODES) {
+      print(node.id);
+    }
     return const Text('data:');
   }
 }
