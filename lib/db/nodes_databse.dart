@@ -82,6 +82,7 @@ class NodesDatabase {
     final db = await instance.database;
 
     final result = await db.query(tableNodes);
+    print(result);
     return result.map((json) => Node.fromJson(json)).toList();
     // ORDER BY　とか ?? https://youtu.be/UpKrhZ0Hppk?t=1189
   }
