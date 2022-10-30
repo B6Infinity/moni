@@ -1,3 +1,18 @@
+// ignore_for_file: non_constant_identifier_names, constant_identifier_names
+
+const String tableNodes = 'nodes';
+
+class NodeFields {
+  static const String id = '_id';
+  static const String name = 'name';
+  static const String bg_color = 'bg_color';
+  static const String txt_color = 'txt_color';
+  static const String size = 'size';
+  static const String coords = 'coords';
+  static const String max_amt = 'max_amt';
+  static const String present_amt = 'present_amt';
+}
+
 class Node {
   final int? id;
   final String? name;
@@ -19,4 +34,3 @@ class Node {
     this.present_amt,
   });
 }
-// https://youtu.be/UpKrhZ0Hppk?t=293
