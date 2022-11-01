@@ -90,9 +90,9 @@ class _AccountantState extends State<Accountant> {
           });
         }
 
-        void changeTXTColor(Color bgcolor) {
+        void changeTXTColor(Color txtcolor) {
           setState(() {
-            nodeTextColor = bgcolor;
+            nodeTextColor = txtcolor;
           });
         }
 
@@ -124,7 +124,8 @@ class _AccountantState extends State<Accountant> {
                     title: Text('Background Color'),
                     trailing: ElevatedButton(
                       onPressed: (() {
-                        // pickColor();
+                        // BG COLOR
+
                         showDialog(
                           context: context,
                           barrierDismissible: false,
@@ -165,7 +166,8 @@ class _AccountantState extends State<Accountant> {
                     title: Text('Text Color'),
                     trailing: ElevatedButton(
                       onPressed: (() {
-                        // pickColor();
+                        // TEXT COLOR
+
                         showDialog(
                           context: context,
                           barrierDismissible: false,
@@ -175,9 +177,9 @@ class _AccountantState extends State<Accountant> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   ColorPicker(
-                                    pickerColor: nodeBackgroundColor,
+                                    pickerColor: nodeTextColor,
                                     onColorChanged: (value) =>
-                                        changeBGColor(value),
+                                        changeTXTColor(value),
                                   ),
                                 ],
                               ),
