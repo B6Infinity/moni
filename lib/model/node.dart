@@ -48,6 +48,7 @@ class Node {
 
   static Node fromJson(Map<String, Object?> json) {
     return Node(
+      id: int.parse(json[NodeFields.id].toString()),
       name: json[NodeFields.name] as String,
       bg_color: json[NodeFields.bg_color] as String,
       txt_color: json[NodeFields.txt_color] as String,

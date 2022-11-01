@@ -3,6 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:moni/model/node.dart';
 
 class AccountantBody extends StatefulWidget {
@@ -19,7 +20,6 @@ class _AccountantBodyState extends State<AccountantBody> {
   Widget build(BuildContext context) {
     for (var node in widget.NODES) {
       print(node.toJson());
-      // TODO: ID is null fix it!
     }
 
     // SHOW THE NODES

@@ -66,8 +66,6 @@ class _AccountantState extends State<Accountant> {
   }
 
   void createNode() {
-    print('HI NODE');
-
     // nodeDB.create(
     //   Node(
     //       name: 'name',
@@ -229,9 +227,23 @@ class _AccountantState extends State<Accountant> {
                         return;
                       }
 
-                      print('$name $maxAmt $bgColor $textColor');
-
                       // ADD 2 DB
+
+                      nodeDB.create(
+                        Node(
+                            name: name,
+                            bg_color: '#${colorToHex(bgColor)}',
+                            txt_color: '#${colorToHex(textColor)}',
+                            size: 1,
+                            max_amt: int.parse(maxAmt),
+                            present_amt: 0),
+                      );
+
+                      setState(
+                        () {
+                          Navigator.of(context).pop();
+                        },
+                      );
                     },
                     child: const Text('CREATE')),
                 TextButton(
