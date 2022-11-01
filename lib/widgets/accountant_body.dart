@@ -18,9 +18,12 @@ class _AccountantBodyState extends State<AccountantBody> {
   @override
   Widget build(BuildContext context) {
     for (var node in widget.NODES) {
-      print(node.id);
+      print(node.toJson());
       // TODO: ID is null fix it!
     }
+
+    // SHOW THE NODES
+
     return const Text('data:');
   }
 }

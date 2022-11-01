@@ -72,17 +72,36 @@ class _AccountantState extends State<Accountant> {
     //       present_amt: 50),
     // );
 
-    // showDialog(
-    //   context: context,
-    //   builder: (context) {
-    //     return Dialog(
-    //       child: Column(children: const [
-    //         TextField(
-    //           decoration: InputDecoration(hintText: 'Name'),
-    //         )
-    //       ]),
-    //     );
-    //   },
-    // );
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Create Node...',
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  decoration: InputDecoration(hintText: 'Name'),
+                ),
+                TextField(
+                  decoration: InputDecoration(hintText: 'Color'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
