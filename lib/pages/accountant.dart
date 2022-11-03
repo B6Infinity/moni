@@ -244,6 +244,7 @@ class _AccountantState extends State<Accountant> {
                       setState(
                         () {
                           Navigator.of(context).pop();
+                          refreshNodes();
                         },
                       );
                     },
