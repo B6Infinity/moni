@@ -7,6 +7,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:moni/db/nodes_databse.dart';
 import 'package:moni/model/node.dart';
 import 'package:moni/utils/controllers.dart';
 
@@ -24,8 +25,17 @@ class _AccountantBodyState extends State<AccountantBody> {
   Widget build(BuildContext context) {
     List<Widget> nodeCards = [];
 
+    Future rebuildNodes() async {
+      print("GIB NODES");
+      for (var node in await NodesDatabase.instance.readAllNodes()) {
+        print(node.toJson());
+      }
+
+      return true;
+    }
+
     for (var node in widget.NODES) {
-      print(node.toJson());
+      // print(node.toJson());
 
       nodeCards.add(
         StaggeredGridTile.count(
@@ -114,6 +124,8 @@ class _AccountantBodyState extends State<AccountantBody> {
               Color nodeTXTcolor = colorFromHex(node.txt_color) ?? Colors.white;
               Color nodeBGcolor = colorFromHex(node.bg_color) ?? Colors.black;
 
+              int nodeSize = node.size;
+
               void changeTXTColor(Color color) {
                 setState(() {
                   nodeTXTcolor = color;
@@ -146,13 +158,24 @@ class _AccountantBodyState extends State<AccountantBody> {
                             contentPadding: const EdgeInsets.only(
                                 left: 0, right: 8, top: 8, bottom: 0),
                             title: const Text('Size'),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Icon(Icons.abc),
-                                Icon(Icons.abc),
-                                Icon(Icons.abc),
-                              ],
+                            trailing: IconButton(
+                              icon: Icon(
+                                Icons.square,
+                                size: (10 * nodeSize).toDouble(),
+                                color: nodeBGcolor,
+                                shadows: [
+                                  Shadow(
+                                      color: nodeTXTcolor,
+                                      offset: const Offset(2, 2),
+                                      blurRadius: 2),
+                                ],
+                              ),
+                              onPressed: () {
+                                setState(
+                                  () => nodeSize =
+                                      nodeSize == 3 ? 1 : nodeSize + 1,
+                                );
+                              },
                             ),
                           ),
                           TextField(
@@ -199,7 +222,7 @@ class _AccountantBodyState extends State<AccountantBody> {
                                                 Navigator.of(context).pop();
                                               });
                                             }),
-                                            child: Text('OK'))
+                                            child: const Text('OK'))
                                       ],
                                     );
                                   },
@@ -241,7 +264,7 @@ class _AccountantBodyState extends State<AccountantBody> {
                                                 Navigator.of(context).pop();
                                               });
                                             }),
-                                            child: Text('OK'))
+                                            child: const Text('OK'))
                                       ],
                                     );
                                   },
@@ -257,7 +280,26 @@ class _AccountantBodyState extends State<AccountantBody> {
                       ),
                       actions: [
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            int updRES =
+                                await NodesDatabase.instance.updateNode(
+                              node.id!,
+                              Node(
+                                  id: node.id,
+                                  name: nodeEDIT_inputcontroller__NAME.text,
+                                  bg_color: '#${colorToHex(nodeBGcolor)}',
+                                  txt_color: '#${colorToHex(nodeTXTcolor)}',
+                                  size: nodeSize,
+                                  max_amt: int.parse(
+                                      nodeEDIT_inputcontroller__TARGET_AMT
+                                          .text),
+                                  present_amt: 0),
+                            );
+
+                            if (updRES == node.id) {
+                              await rebuildNodes();
+                            }
+                          },
                           child: const Icon(Icons.save),
                         ),
                         TextButton(
@@ -278,7 +320,6 @@ class _AccountantBodyState extends State<AccountantBody> {
     }
 
     // SHOW THE NODES
-    // https://www.youtube.com/watch?v=XNwL_9ur8R8&ab_channel=JohannesMilke
 
     return Container(
       padding: const EdgeInsets.all(8.0),

@@ -87,14 +87,14 @@ class NodesDatabase {
     // ORDER BY　とか ?? https://youtu.be/UpKrhZ0Hppk?t=1189
   }
 
-  Future<int> updateNode(Node node) async {
+  Future<int> updateNode(int id, Node node) async {
     final db = await instance.database;
 
     return db.update(
       tableNodes,
       node.toJson(),
       where: '${NodeFields.id} = ?',
-      whereArgs: [node.id],
+      whereArgs: [id],
     );
   }
 
