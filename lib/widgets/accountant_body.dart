@@ -21,18 +21,16 @@ class AccountantBody extends StatefulWidget {
 }
 
 class _AccountantBodyState extends State<AccountantBody> {
+  void rebuildNodes() {
+    // for (var node in widget.NODES) {
+    //   print(node.toJson());
+    // }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> nodeCards = [];
-
-    Future rebuildNodes() async {
-      print("GIB NODES");
-      for (var node in await NodesDatabase.instance.readAllNodes()) {
-        print(node.toJson());
-      }
-
-      return true;
-    }
 
     for (var node in widget.NODES) {
       // print(node.toJson());
@@ -281,23 +279,32 @@ class _AccountantBodyState extends State<AccountantBody> {
                       actions: [
                         TextButton(
                           onPressed: () async {
+                            Node newNode = Node(
+                                id: node.id,
+                                name: nodeEDIT_inputcontroller__NAME.text,
+                                bg_color: '#${colorToHex(nodeBGcolor)}',
+                                txt_color: '#${colorToHex(nodeTXTcolor)}',
+                                size: nodeSize,
+                                max_amt: int.parse(
+                                    nodeEDIT_inputcontroller__TARGET_AMT.text),
+                                present_amt: 0);
+
                             int updRES =
                                 await NodesDatabase.instance.updateNode(
                               node.id!,
-                              Node(
-                                  id: node.id,
-                                  name: nodeEDIT_inputcontroller__NAME.text,
-                                  bg_color: '#${colorToHex(nodeBGcolor)}',
-                                  txt_color: '#${colorToHex(nodeTXTcolor)}',
-                                  size: nodeSize,
-                                  max_amt: int.parse(
-                                      nodeEDIT_inputcontroller__TARGET_AMT
-                                          .text),
-                                  present_amt: 0),
+                              newNode,
                             );
 
-                            if (updRES == node.id) {
-                              await rebuildNodes();
+                            if (updRES == 1) {
+                              for (var NODE in widget.NODES) {
+                                if (NODE.id == node.id) {
+                                  // print(NODE.toJson());
+                                  widget.NODES[widget.NODES.indexOf(node)] =
+                                      newNode;
+                                }
+                              }
+                              rebuildNodes();
+                              Navigator.pop(context);
                             }
                           },
                           child: const Icon(Icons.save),
