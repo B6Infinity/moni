@@ -538,11 +538,16 @@ class _AccountantBodyState extends State<AccountantBody> {
     return Container(
       padding: const EdgeInsets.all(8.0),
       child: Scaffold(
-        body: StaggeredGrid.count(
-          crossAxisCount: 4,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          children: nodeCards,
+        body: ListView(
+          padding: const EdgeInsets.all(10),
+          children: [
+            StaggeredGrid.count(
+              crossAxisCount: 4,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              children: nodeCards,
+            )
+          ],
         ),
         // floatingActionButton: FloatingActionButton(
         //   onPressed: createNode,
