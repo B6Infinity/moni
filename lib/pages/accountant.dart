@@ -224,7 +224,7 @@ class _AccountantState extends State<Accountant> {
                         showSnackBarMSG(context, 'Name is empty!');
                         return;
                       }
-                      if (maxAmt.isEmpty) {
+                      if (maxAmt.isEmpty || int.parse(maxAmt) <= 0) {
                         showSnackBarMSG(context, 'Max Amount is empty!');
                         return;
                       }

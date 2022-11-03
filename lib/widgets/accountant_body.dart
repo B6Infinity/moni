@@ -30,211 +30,6 @@ class _AccountantBodyState extends State<AccountantBody> {
     setState(() {});
   }
 
-  void createNode() {
-    // nodeDB.create(
-    //   Node(
-    //       name: 'name',
-    //       bg_color: 'bg_color',
-    //       txt_color: 'txt_color',
-    //       size: 1,
-    //       max_amt: 1500,
-    //       present_amt: 50),
-    // );
-
-    Color nodeBackgroundColor = Colors.black;
-    Color nodeTextColor = Colors.blue;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        //
-        void changeBGColor(Color bgcolor) {
-          setState(() {
-            nodeBackgroundColor = bgcolor;
-          });
-        }
-
-        void changeTXTColor(Color txtcolor) {
-          setState(() {
-            nodeTextColor = txtcolor;
-          });
-        }
-
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Create Node...',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    decoration: const InputDecoration(label: Text('Name')),
-                    controller: node_inputcontroller__NAME,
-                  ),
-                  ListTile(
-                    contentPadding: const EdgeInsets.only(
-                        left: 0, right: 8, top: 8, bottom: 8),
-                    title: const Text('Background Color'),
-                    trailing: ElevatedButton(
-                      onPressed: (() {
-                        // BG COLOR
-
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) {
-                            return AlertDialog(
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  ColorPicker(
-                                    pickerColor: nodeBackgroundColor,
-                                    onColorChanged: (value) =>
-                                        changeBGColor(value),
-                                  ),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                    onPressed: (() {
-                                      setState(() {
-                                        Navigator.of(context).pop();
-                                      });
-                                    }),
-                                    child: const Text('OK'))
-                              ],
-                            );
-                          },
-                        );
-                      }),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: nodeBackgroundColor,
-                      ),
-                      child: const Icon(Icons.color_lens),
-                    ),
-                  ),
-                  ListTile(
-                    contentPadding: const EdgeInsets.only(
-                        left: 0, right: 8, top: 0, bottom: 8),
-                    title: const Text('Text Color'),
-                    trailing: ElevatedButton(
-                      onPressed: (() {
-                        // TEXT COLOR
-
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) {
-                            return AlertDialog(
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  ColorPicker(
-                                    pickerColor: nodeTextColor,
-                                    onColorChanged: (value) =>
-                                        changeTXTColor(value),
-                                  ),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                    onPressed: (() {
-                                      setState(() {
-                                        Navigator.of(context).pop();
-                                      });
-                                    }),
-                                    child: const Text('OK'))
-                              ],
-                            );
-                          },
-                        );
-                      }),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: nodeTextColor,
-                      ),
-                      child: const Icon(Icons.color_lens),
-                    ),
-                  ),
-                  TextField(
-                    controller: node_inputcontroller__TARGET_AMT,
-                    decoration:
-                        const InputDecoration(label: Text('Target Amt.')),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    // GET THE VALUES:
-                    final name = node_inputcontroller__NAME.text;
-                    final maxAmt = node_inputcontroller__TARGET_AMT.text;
-                    final bgColor = nodeBackgroundColor;
-                    final textColor = nodeTextColor;
-
-                    // FRISK
-                    if (name.isEmpty) {
-                      showSnackBarMSG(context, 'Name is empty!');
-                      return;
-                    }
-                    if (maxAmt.isEmpty || int.parse(maxAmt) == 0) {
-                      showSnackBarMSG(context, 'Max Amount is empty!');
-                      return;
-                    }
-
-                    // ADD 2 DB
-
-                    Node newNode = Node(
-                      name: name,
-                      bg_color: '#${colorToHex(bgColor)}',
-                      txt_color: '#${colorToHex(textColor)}',
-                      size: 1,
-                      max_amt: int.parse(maxAmt),
-                      present_amt: 0,
-                    );
-
-                    NodesDatabase.instance.create(newNode);
-
-                    // widget.NODES.add(newNode);
-                    // rebuildNodes();
-
-                    setState(
-                      () {
-                        Navigator.of(context).pop();
-                      },
-                    );
-                  },
-                  child: const Text('CREATE'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    node_inputcontroller__NAME.text = '';
-                    node_inputcontroller__TARGET_AMT.text = '';
-                  },
-                  child: const Text('CANCEL'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     List<Widget> nodeCards = [];
@@ -485,6 +280,50 @@ class _AccountantBodyState extends State<AccountantBody> {
                         ],
                       ),
                       actions: [
+                        IconButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                    'Are you sure?',
+                                    style: TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        NodesDatabase.instance
+                                            .deleteNode(node.id!);
+
+                                        widget.NODES.remove(node);
+
+                                        rebuildNodes();
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text(
+                                        'YES',
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('NO'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                        ),
                         TextButton(
                           onPressed: () async {
                             Node newNode = Node(
