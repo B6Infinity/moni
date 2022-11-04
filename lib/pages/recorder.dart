@@ -9,8 +9,11 @@ import 'package:moni/db/flow_database.dart';
 import 'package:moni/db/nodes_databse.dart';
 import 'package:moni/model/Flow.dart';
 import 'package:moni/model/flow.dart' as m_flow;
+import 'package:moni/utils/constants.dart';
 import 'package:moni/utils/controllers.dart';
 import 'package:moni/utils/methods.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class Recorder extends StatefulWidget {
   const Recorder({super.key});
@@ -20,8 +23,10 @@ class Recorder extends StatefulWidget {
 }
 
 class _RecorderState extends State<Recorder> {
+  late final prefs;
   late var allNodes;
   var allFlows = [];
+  late int liveMoney;
 
   bool isBodyLoading = false;
 
@@ -40,6 +45,16 @@ class _RecorderState extends State<Recorder> {
     allNodes = await NodesDatabase.instance.readAllNodes();
     allFlows = await FlowDatabase.instance.readAllFlows();
 
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance(); //TODO: DO not Initiate Again
+
+    if (await prefs.getInt(liveMoney_ShPrefKEY) == null) {
+      // Instantiate SharedPref
+      await prefs.setInt(liveMoney_ShPrefKEY, 0);
+    }
+
+    liveMoney = await prefs.getInt(liveMoney_ShPrefKEY)!;
+
     setState(() {
       isBodyLoading = false;
     });
@@ -49,7 +64,6 @@ class _RecorderState extends State<Recorder> {
   Widget build(BuildContext context) {
     List<Widget> moneyFlows = [];
 
-    // DateTime.now().hour
     for (var flow in allFlows) {
       String flowTime = (flow.date_of_flow.hour > 12)
           ? '${flow.date_of_flow.hour - 12}:${flow.date_of_flow.minute} PM'
@@ -98,7 +112,7 @@ class _RecorderState extends State<Recorder> {
                             bottomRight: Radius.circular(30))),
                     child: Center(
                         child: Text(
-                      '₹ 50,000',
+                      '₹ ${NumberFormat.decimalPattern('en_us').format(liveMoney)}',
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.w700,
@@ -156,7 +170,7 @@ class _RecorderState extends State<Recorder> {
                 ),
                 Expanded(
                   child: ListView(
-                    children: moneyFlows,
+                    children: moneyFlows.reversed.toList(),
                   ),
                 )
               ],
@@ -238,7 +252,7 @@ class _RecorderState extends State<Recorder> {
                   child: Text('CREATE'),
                   onPressed: () async {
                     //
-                    // CREATE FLOW
+                    // CREATE FLOW --------------------------------------------------------------------------
 
                     // FRISK DATA
                     if (flow_inputcontroller__NAME.text.isEmpty) {
@@ -260,7 +274,13 @@ class _RecorderState extends State<Recorder> {
                       ),
                     );
 
-                    print(createdFlow);
+                    // INCOME -> Add to liveMoney
+                    if (isIncome) {
+                      liveMoney += createdFlow.amt;
+                      print(liveMoney);
+                      // await prefs.setInt(liveMoney_ShPrefKEY, liveMoney);
+                    }
+                    // EXPENDITURE -> Deduct from Node and Live Money
 
                     // CLEAN UP
 
