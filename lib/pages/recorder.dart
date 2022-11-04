@@ -30,6 +30,8 @@ class _RecorderState extends State<Recorder> {
     super.initState();
 
     refreshData();
+
+    // TODO: Remove RED ERROR screen on startups
   }
 
   void refreshData() async {
