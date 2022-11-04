@@ -138,7 +138,6 @@ class _AccountantBodyState extends State<AccountantBody> {
                 });
               }
 
-              // TODO: Add DELETE Functionality
               showDialog(
                 context: context,
                 builder: (context) => StatefulBuilder(
@@ -303,6 +302,7 @@ class _AccountantBodyState extends State<AccountantBody> {
                                         widget.NODES.remove(node);
 
                                         rebuildNodes();
+                                        Navigator.pop(context);
                                         Navigator.pop(context);
                                       },
                                       child: const Text(
