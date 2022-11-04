@@ -21,7 +21,7 @@ class Recorder extends StatefulWidget {
 
 class _RecorderState extends State<Recorder> {
   late var allNodes;
-  late var allFlows;
+  var allFlows = [];
 
   bool isBodyLoading = false;
 
@@ -30,8 +30,6 @@ class _RecorderState extends State<Recorder> {
     super.initState();
 
     refreshData();
-
-    // TODO: Remove RED ERROR screen on startups
   }
 
   void refreshData() async {
@@ -51,7 +49,11 @@ class _RecorderState extends State<Recorder> {
   Widget build(BuildContext context) {
     List<Widget> moneyFlows = [];
 
+    // DateTime.now().hour
     for (var flow in allFlows) {
+      String flowTime = (flow.date_of_flow.hour > 12)
+          ? '${flow.date_of_flow.hour - 12}:${flow.date_of_flow.minute} PM'
+          : '${flow.date_of_flow.hour}:${flow.date_of_flow.minute} AM';
       moneyFlows.add(
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
@@ -72,7 +74,9 @@ class _RecorderState extends State<Recorder> {
             ),
             subtitle: Text(flow.name),
             trailing: Text(
-                '${flow.date_of_flow.day}.${flow.date_of_flow.month}.${flow.date_of_flow.year}n'),
+              '${flow.date_of_flow.day}.${flow.date_of_flow.month}.${flow.date_of_flow.year}\n$flowTime',
+              style: TextStyle(color: Colors.grey),
+            ),
           ),
         ),
       );
@@ -151,9 +155,8 @@ class _RecorderState extends State<Recorder> {
                   ),
                 ),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListView(children: moneyFlows),
+                  child: ListView(
+                    children: moneyFlows,
                   ),
                 )
               ],
