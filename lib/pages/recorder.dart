@@ -117,39 +117,50 @@ class _RecorderState extends State<Recorder> {
                     decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
                         borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(30),
-                            bottomRight: Radius.circular(30))),
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (liveMoney > 0)
+                                ? Colors.green[800]!
+                                : Colors.red[800]!,
+                            blurRadius: 5,
+                            offset: Offset(0, 10),
+                          )
+                        ]),
                     child: Center(
-                        child: Text(
-                      '₹ ${NumberFormat.decimalPattern('en_us').format(liveMoney)}',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.green,
-                        // shadows: [
-                        //   Shadow(
-                        //     color: Colors.green,
-                        //     blurRadius: 20,
-                        //     offset: Offset(2, 2),
-                        //   ),
-                        //   Shadow(
-                        //     color: Colors.green,
-                        //     blurRadius: 20,
-                        //     offset: Offset(-2, -2),
-                        //   ),
-                        //   Shadow(
-                        //     color: Colors.green,
-                        //     blurRadius: 20,
-                        //     offset: Offset(4, 4),
-                        //   ),
-                        //   Shadow(
-                        //     color: Colors.green,
-                        //     blurRadius: 20,
-                        //     offset: Offset(-4, -4),
-                        //   ),
-                        // ],
+                      child: Text(
+                        '₹ ${NumberFormat.decimalPattern('en_us').format(liveMoney)}',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w700,
+                          color: (liveMoney > 0) ? Colors.green : Colors.red,
+                          // shadows: [
+                          //   Shadow(
+                          //     color: Colors.green,
+                          //     blurRadius: 20,
+                          //     offset: Offset(2, 2),
+                          //   ),
+                          //   Shadow(
+                          //     color: Colors.green,
+                          //     blurRadius: 20,
+                          //     offset: Offset(-2, -2),
+                          //   ),
+                          //   Shadow(
+                          //     color: Colors.green,
+                          //     blurRadius: 20,
+                          //     offset: Offset(4, 4),
+                          //   ),
+                          //   Shadow(
+                          //     color: Colors.green,
+                          //     blurRadius: 20,
+                          //     offset: Offset(-4, -4),
+                          //   ),
+                          // ],
+                        ),
                       ),
-                    )),
+                    ),
                   ),
                 ),
                 Padding(padding: EdgeInsets.all(10)),
