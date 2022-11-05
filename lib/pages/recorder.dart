@@ -23,7 +23,7 @@ class Recorder extends StatefulWidget {
 }
 
 class _RecorderState extends State<Recorder> {
-  late final prefs;
+  late SharedPreferences prefs;
   late var allNodes;
   var allFlows = [];
   late int liveMoney;
@@ -34,7 +34,26 @@ class _RecorderState extends State<Recorder> {
   void initState() {
     super.initState();
 
+    initSharedPref();
+
     refreshData();
+  }
+
+  Future initSharedPref() async {
+    prefs = await SharedPreferences.getInstance();
+
+    try {
+      prefs.getInt(liveMoney_ShPrefKEY);
+    } catch (e) {
+      SharedPreferences.setMockInitialValues({});
+    }
+
+    if (prefs.getInt(liveMoney_ShPrefKEY) == null) {
+      // Instantiate SharedPref
+      await prefs.setInt(liveMoney_ShPrefKEY, 0);
+    }
+
+    liveMoney = prefs.getInt(liveMoney_ShPrefKEY)!;
   }
 
   void refreshData() async {
@@ -44,16 +63,6 @@ class _RecorderState extends State<Recorder> {
 
     allNodes = await NodesDatabase.instance.readAllNodes();
     allFlows = await FlowDatabase.instance.readAllFlows();
-
-    SharedPreferences.setMockInitialValues({});
-    prefs = await SharedPreferences.getInstance(); //TODO: DO not Initiate Again
-
-    if (await prefs.getInt(liveMoney_ShPrefKEY) == null) {
-      // Instantiate SharedPref
-      await prefs.setInt(liveMoney_ShPrefKEY, 0);
-    }
-
-    liveMoney = await prefs.getInt(liveMoney_ShPrefKEY)!;
 
     setState(() {
       isBodyLoading = false;
@@ -277,11 +286,13 @@ class _RecorderState extends State<Recorder> {
                     // INCOME -> Add to liveMoney
                     if (isIncome) {
                       liveMoney += createdFlow.amt;
-                      print(liveMoney);
-                      // await prefs.setInt(liveMoney_ShPrefKEY, liveMoney);
-                    }
-                    // EXPENDITURE -> Deduct from Node and Live Money
+                    } else {
+                      // EXPENDITURE -> Deduct from Node and Live Money
 
+                      liveMoney -= createdFlow.amt;
+                    }
+
+                    await prefs.setInt(liveMoney_ShPrefKEY, liveMoney);
                     // CLEAN UP
 
                     // ignore: use_build_context_synchronously
