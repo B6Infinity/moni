@@ -96,7 +96,7 @@ class _RecorderState extends State<Recorder> {
               size: 30,
             ),
             title: Text(
-              '₹ ${flow.amt} /-',
+              '₹ ${NumberFormat.decimalPattern('en_us').format(flow.amt)} /-',
               style: TextStyle(
                 color: flow.is_income ? Colors.green : Colors.red,
                 fontSize: 22,
@@ -236,7 +236,10 @@ class _RecorderState extends State<Recorder> {
                               color: colorFromHex(node.txt_color),
                             ),
                           ),
-                          Text('${node.present_amt}'),
+                          Text(
+                            NumberFormat.decimalPattern('en_us')
+                                .format(node.present_amt),
+                          ),
                         ],
                       )),
                 ),

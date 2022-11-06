@@ -87,7 +87,8 @@ class _AccountantBodyState extends State<AccountantBody> {
                         ),
                       ),
                       Text(
-                        '${node.max_amt}',
+                        NumberFormat.decimalPattern('en_us')
+                            .format(node.max_amt),
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w400,
@@ -182,6 +183,10 @@ class _AccountantBodyState extends State<AccountantBody> {
                               decoration: const InputDecoration(
                                 label: Text('Target Amt.'),
                               ),
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
                             ),
                             ListTile(
                               contentPadding: const EdgeInsets.only(
@@ -317,16 +322,38 @@ class _AccountantBodyState extends State<AccountantBody> {
                           ),
                           TextButton(
                             onPressed: () async {
+                              // FRISK DATA
+                              if (nodeEDIT_inputcontroller__NAME.text.isEmpty) {
+                                showSnackBarMSG(context, 'Name is empty');
+                                return;
+                              }
+                              if (nodeEDIT_inputcontroller__TARGET_AMT
+                                      .text.isEmpty ||
+                                  int.parse(nodeEDIT_inputcontroller__TARGET_AMT
+                                          .text) ==
+                                      0) {
+                                showSnackBarMSG(
+                                    context, 'Target Amount is empty');
+                                return;
+                              }
+                              if (int.parse(nodeEDIT_inputcontroller__TARGET_AMT
+                                      .text) <
+                                  node.present_amt) {
+                                showSnackBarMSG(context,
+                                    'Target amount is less than present amount');
+                                return;
+                              }
+
                               Node newNode = Node(
-                                  id: node.id,
-                                  name: nodeEDIT_inputcontroller__NAME.text,
-                                  bg_color: '#${colorToHex(nodeBGcolor)}',
-                                  txt_color: '#${colorToHex(nodeTXTcolor)}',
-                                  size: nodeSize,
-                                  max_amt: int.parse(
-                                      nodeEDIT_inputcontroller__TARGET_AMT
-                                          .text),
-                                  present_amt: 0);
+                                id: node.id,
+                                name: nodeEDIT_inputcontroller__NAME.text,
+                                bg_color: '#${colorToHex(nodeBGcolor)}',
+                                txt_color: '#${colorToHex(nodeTXTcolor)}',
+                                size: nodeSize,
+                                max_amt: int.parse(
+                                    nodeEDIT_inputcontroller__TARGET_AMT.text),
+                                present_amt: node.present_amt,
+                              );
 
                               int updRES =
                                   await NodesDatabase.instance.updateNode(
@@ -379,7 +406,7 @@ class _AccountantBodyState extends State<AccountantBody> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(
-                        '${node.present_amt} / ${node.max_amt}',
+                        '${NumberFormat.decimalPattern('en_us').format(node.present_amt)} / ${NumberFormat.decimalPattern('en_us').format(node.max_amt)}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w400,
@@ -396,10 +423,28 @@ class _AccountantBodyState extends State<AccountantBody> {
                 showDialog(
                   context: context,
                   builder: (context) {
+                    bool isInserting = true;
                     return StatefulBuilder(
                       builder: (context, setState) {
                         return AlertDialog(
-                          title: Text('Add Money to "${node.name}"'),
+                          title: GestureDetector(
+                            child: Text(
+                              '${isInserting ? "Add" : "Remove"} Money ${isInserting ? "to" : "from"} "${node.name}"',
+                              style: TextStyle(
+                                color: isInserting ? Colors.green : Colors.red,
+                              ),
+                            ),
+                            onTap: () {
+                              if (isInserting) {
+                                isInserting = false;
+                              } else {
+                                isInserting = true;
+                              }
+                              setState(
+                                () {},
+                              );
+                            },
+                          ),
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -407,7 +452,7 @@ class _AccountantBodyState extends State<AccountantBody> {
                                 controller: idleMoney_inputcontroller__AMT,
                                 decoration: InputDecoration(
                                   label: Text(
-                                      'Amount (Max: ₹ ${NumberFormat.decimalPattern('en_us').format(widget.idleMoney)})'),
+                                      'Amount (Limit: ₹ ${NumberFormat.decimalPattern('en_us').format(widget.idleMoney)})'),
                                 ),
                                 keyboardType: TextInputType.number,
                                 inputFormatters: [
@@ -415,16 +460,28 @@ class _AccountantBodyState extends State<AccountantBody> {
                                 ],
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(25),
+                                padding:
+                                    const EdgeInsets.only(top: 25, bottom: 10),
                                 child: Text(
-                                  'Target Amount: ₹ ${NumberFormat.decimalPattern('en_us').format(node.max_amt)} /-',
+                                  'Remaining Amount: ₹ ${NumberFormat.decimalPattern('en_us').format(node.max_amt - node.present_amt)} /-',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.green[400],
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                              )
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(15),
+                                child: Text(
+                                  'Target Amount: ₹ ${NumberFormat.decimalPattern('en_us').format(node.max_amt)} /-',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.grey[400],
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                           actions: [
@@ -451,7 +508,7 @@ class _AccountantBodyState extends State<AccountantBody> {
                                 // Update the Node
                                 Node newNode = Node(
                                   id: node.id,
-                                  name: nodeEDIT_inputcontroller__NAME.text,
+                                  name: node.name,
                                   bg_color: node.bg_color,
                                   txt_color: node.txt_color,
                                   size: node.size,
@@ -478,6 +535,13 @@ class _AccountantBodyState extends State<AccountantBody> {
 
                                 await widget.prefs.setInt(idleMoney_ShPrefKEY,
                                     widget.idleMoney - amtToInsert);
+
+                                setState(
+                                  () {
+                                    idleMoney_inputcontroller__AMT.text = '';
+                                    Navigator.pop(context);
+                                  },
+                                );
                               },
                               child: const Text('INSERT'),
                             ),
