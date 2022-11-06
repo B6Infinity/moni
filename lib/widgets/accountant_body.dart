@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_const_constructors
 
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,20 +8,28 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:intl/intl.dart';
 import 'package:moni/db/nodes_databse.dart';
 import 'package:moni/model/node.dart';
+import 'package:moni/utils/constants.dart';
 import 'package:moni/utils/controllers.dart';
 import 'package:moni/utils/methods.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountantBody extends StatefulWidget {
-  const AccountantBody(
-      {super.key, required this.NODES, required this.idleMoney});
+  const AccountantBody({
+    super.key,
+    required this.NODES,
+    required this.idleMoney,
+    required this.prefs,
+  });
 
   @override
   State<AccountantBody> createState() => _AccountantBodyState();
 
   final List<Node> NODES;
   final int idleMoney;
+  final SharedPreferences prefs;
 }
 
 class _AccountantBodyState extends State<AccountantBody> {
@@ -81,10 +89,21 @@ class _AccountantBodyState extends State<AccountantBody> {
                       Text(
                         '${node.max_amt}',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 17,
                           fontWeight: FontWeight.w400,
                           // color: colorFromHex(node.bg_color),
-                          // shadows: [Shadow(color: colorFromHex(node.txt_color)!)],
+                          // shadows: [
+                          //   Shadow(
+                          //     color: colorFromHex(node.txt_color)!,
+                          //     blurRadius: 5,
+                          //     offset: const Offset(0.5, 0.5),
+                          //   ),
+                          //   Shadow(
+                          //     color: colorFromHex(node.txt_color)!,
+                          //     blurRadius: 5,
+                          //     offset: const Offset(-0.5, -0.5),
+                          //   ),
+                          // ],
                         ),
                       ),
                     ],
@@ -383,14 +402,95 @@ class _AccountantBodyState extends State<AccountantBody> {
                           title: Text('Add Money to "${node.name}"'),
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            children: [
                               TextField(
+                                controller: idleMoney_inputcontroller__AMT,
                                 decoration: InputDecoration(
-                                  label: Text('Amount'),
+                                  label: Text(
+                                      'Amount (Max: ₹ ${NumberFormat.decimalPattern('en_us').format(widget.idleMoney)})'),
                                 ),
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
                               ),
+                              Padding(
+                                padding: const EdgeInsets.all(25),
+                                child: Text(
+                                  'Target Amount: ₹ ${NumberFormat.decimalPattern('en_us').format(node.max_amt)} /-',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.green[400],
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              )
                             ],
                           ),
+                          actions: [
+                            TextButton(
+                              onPressed: () async {
+                                if (idleMoney_inputcontroller__AMT
+                                        .text.isEmpty ||
+                                    int.parse(idleMoney_inputcontroller__AMT
+                                            .text) ==
+                                        0 ||
+                                    int.parse(idleMoney_inputcontroller__AMT
+                                            .text) >
+                                        widget.idleMoney ||
+                                    int.parse(idleMoney_inputcontroller__AMT
+                                            .text) >
+                                        node.max_amt) {
+                                  showSnackBarMSG(context, 'Invalid Amount');
+                                  return;
+                                }
+
+                                int amtToInsert = int.parse(
+                                    idleMoney_inputcontroller__AMT.text);
+
+                                // Update the Node
+                                Node newNode = Node(
+                                  id: node.id,
+                                  name: nodeEDIT_inputcontroller__NAME.text,
+                                  bg_color: node.bg_color,
+                                  txt_color: node.txt_color,
+                                  size: node.size,
+                                  max_amt: node.max_amt,
+                                  present_amt: node.present_amt + amtToInsert,
+                                );
+
+                                int updRES =
+                                    await NodesDatabase.instance.updateNode(
+                                  node.id!,
+                                  newNode,
+                                );
+
+                                if (updRES == 1) {
+                                  for (var NODE in widget.NODES) {
+                                    if (NODE.id == node.id) {
+                                      widget.NODES[widget.NODES.indexOf(node)] =
+                                          newNode;
+                                    }
+                                  }
+                                  rebuildNodes();
+                                }
+                                // Deduct from idleMoney
+
+                                await widget.prefs.setInt(idleMoney_ShPrefKEY,
+                                    widget.idleMoney - amtToInsert);
+                              },
+                              child: const Text('INSERT'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text(
+                                'CANCEL',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ],
                         );
                       },
                     );

@@ -75,6 +75,7 @@ class _AccountantState extends State<Accountant> {
           : AccountantBody(
               NODES: NODES,
               idleMoney: idleMoney,
+              prefs: prefs,
             ),
     );
   }
