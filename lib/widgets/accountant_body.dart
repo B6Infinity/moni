@@ -607,7 +607,20 @@ class _AccountantBodyState extends State<AccountantBody> {
         floatingActionButton: widget.idleMoney > 0
             ? FloatingActionButton(
                 backgroundColor: Colors.green,
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Center(
+                          child: Text(
+                            '₹ ${NumberFormat.decimalPattern('en_us').format(widget.idleMoney)} /-',
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
                 child: Text(
                   k_m_b_generator(widget.idleMoney),
                   style: const TextStyle(color: Colors.black),

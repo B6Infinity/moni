@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_build_context_synchronously
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +11,7 @@ import 'package:moni/db/flow_database.dart';
 import 'package:moni/db/nodes_databse.dart';
 import 'package:moni/model/Flow.dart';
 import 'package:moni/model/flow.dart' as m_flow;
+import 'package:moni/model/node.dart';
 import 'package:moni/utils/constants.dart';
 import 'package:moni/utils/controllers.dart';
 import 'package:moni/utils/methods.dart';
@@ -210,6 +211,7 @@ class _RecorderState extends State<Recorder> {
     //VARS
     DateTime dateOfFlow = DateTime.now();
 
+    int? activeNode;
     showDialog(
       context: context,
       builder: (context) {
@@ -219,29 +221,53 @@ class _RecorderState extends State<Recorder> {
 
             for (var node in allNodes) {
               nodeRow.add(
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                GestureDetector(
+                  onTap: () {
+                    setDialogState(() {
+                      activeNode = node.id;
+                    });
+                  },
                   child: Container(
-                      padding: const EdgeInsets.all(8),
-                      height: 80,
-                      width: 80,
-                      color: colorFromHex(node.bg_color),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            node.name,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: colorFromHex(node.txt_color),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: activeNode == node.id ? Colors.grey : null,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black54,
+                              offset: Offset(2, 2),
+                              blurRadius: 2,
                             ),
-                          ),
-                          Text(
-                            NumberFormat.decimalPattern('en_us')
-                                .format(node.present_amt),
-                          ),
-                        ],
-                      )),
+                          ],
+                          borderRadius: BorderRadius.circular(10),
+                          color: colorFromHex(node.bg_color),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        height: 80,
+                        width: 80,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              node.name,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: colorFromHex(node.txt_color),
+                              ),
+                            ),
+                            Text(
+                              NumberFormat.decimalPattern('en_us')
+                                  .format(node.present_amt),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               );
             }
@@ -346,6 +372,28 @@ class _RecorderState extends State<Recorder> {
                       return;
                     }
 
+                    // IF EXPENDITURE ---------
+                    Node? node2deductFrom =
+                        await NodesDatabase.instance.readNode(activeNode!);
+
+                    if (!isIncome) {
+                      if (activeNode == null) {
+                        showSnackBarMSG(context, 'Select a node...');
+                        return;
+                      }
+
+                      if (node2deductFrom!.present_amt <
+                          int.parse(flow_inputcontroller__AMT.text)) {
+                        showSnackBarMSG(context,
+                            'Not Enough money present in "${node2deductFrom.name}"');
+                        return;
+                      }
+
+                      // ALL GOOD
+                      // Deduct from Node
+                    }
+
+                    // Create Flow Object
                     MoneyFlow createdFlow = await FlowDatabase.instance.create(
                       MoneyFlow(
                         name: flow_inputcontroller__NAME.text,
@@ -360,16 +408,29 @@ class _RecorderState extends State<Recorder> {
                       liveMoney += createdFlow.amt;
                       idleMoney += liveMoney;
                     } else {
-                      // EXPENDITURE -> Deduct from Node and Live Money
-
                       liveMoney -= createdFlow.amt;
+                      // EXPENDITURE -> Deduct from Node
+
+                      // node2deductFrom.present_amt
+                      NodesDatabase.instance.updateNode(
+                        activeNode!,
+                        Node(
+                          id: node2deductFrom!.id,
+                          name: node2deductFrom.name,
+                          bg_color: node2deductFrom.bg_color,
+                          txt_color: node2deductFrom.txt_color,
+                          size: node2deductFrom.size,
+                          max_amt: node2deductFrom.max_amt,
+                          present_amt:
+                              node2deductFrom.present_amt - createdFlow.amt,
+                        ),
+                      );
                     }
 
                     await prefs.setInt(liveMoney_ShPrefKEY, liveMoney);
                     await prefs.setInt(idleMoney_ShPrefKEY, idleMoney);
                     // CLEAN UP
 
-                    // ignore: use_build_context_synchronously
                     Navigator.pop(context);
                     flow_inputcontroller__NAME.text = '';
                     flow_inputcontroller__AMT.text = '';
