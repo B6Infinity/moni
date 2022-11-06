@@ -452,7 +452,7 @@ class _AccountantBodyState extends State<AccountantBody> {
                                 controller: idleMoney_inputcontroller__AMT,
                                 decoration: InputDecoration(
                                   label: Text(
-                                      'Amount (Limit: ₹ ${NumberFormat.decimalPattern('en_us').format(widget.idleMoney)})'),
+                                      'Amount (Limit: ₹ ${NumberFormat.decimalPattern('en_us').format(isInserting ? widget.idleMoney : node.present_amt)})'),
                                 ),
                                 keyboardType: TextInputType.number,
                                 inputFormatters: [
@@ -487,23 +487,39 @@ class _AccountantBodyState extends State<AccountantBody> {
                           actions: [
                             TextButton(
                               onPressed: () async {
-                                if (idleMoney_inputcontroller__AMT
-                                        .text.isEmpty ||
-                                    int.parse(idleMoney_inputcontroller__AMT
-                                            .text) ==
-                                        0 ||
-                                    int.parse(idleMoney_inputcontroller__AMT
-                                            .text) >
-                                        widget.idleMoney ||
-                                    int.parse(idleMoney_inputcontroller__AMT
-                                            .text) >
-                                        node.max_amt) {
-                                  showSnackBarMSG(context, 'Invalid Amount');
-                                  return;
+                                if (isInserting) {
+                                  if (idleMoney_inputcontroller__AMT
+                                          .text.isEmpty ||
+                                      int.parse(idleMoney_inputcontroller__AMT
+                                              .text) ==
+                                          0 ||
+                                      int.parse(idleMoney_inputcontroller__AMT
+                                              .text) >
+                                          widget.idleMoney ||
+                                      int.parse(idleMoney_inputcontroller__AMT
+                                              .text) >
+                                          node.max_amt) {
+                                    showSnackBarMSG(context, 'Invalid Amount');
+                                    return;
+                                  }
+                                } else {
+                                  // IS EXTRACTING
+                                  if (idleMoney_inputcontroller__AMT
+                                          .text.isEmpty ||
+                                      int.parse(idleMoney_inputcontroller__AMT
+                                              .text) ==
+                                          0 ||
+                                      int.parse(idleMoney_inputcontroller__AMT
+                                              .text) >
+                                          node.present_amt) {
+                                    showSnackBarMSG(context, 'Invalid Amount');
+                                    return;
+                                  }
                                 }
 
                                 int amtToInsert = int.parse(
-                                    idleMoney_inputcontroller__AMT.text);
+                                    idleMoney_inputcontroller__AMT
+                                        .text); // or Extract
 
                                 // Update the Node
                                 Node newNode = Node(
@@ -513,7 +529,9 @@ class _AccountantBodyState extends State<AccountantBody> {
                                   txt_color: node.txt_color,
                                   size: node.size,
                                   max_amt: node.max_amt,
-                                  present_amt: node.present_amt + amtToInsert,
+                                  present_amt: isInserting
+                                      ? node.present_amt + amtToInsert
+                                      : node.present_amt - amtToInsert,
                                 );
 
                                 int updRES =
@@ -533,8 +551,11 @@ class _AccountantBodyState extends State<AccountantBody> {
                                 }
                                 // Deduct from idleMoney
 
-                                await widget.prefs.setInt(idleMoney_ShPrefKEY,
-                                    widget.idleMoney - amtToInsert);
+                                await widget.prefs.setInt(
+                                    idleMoney_ShPrefKEY,
+                                    isInserting
+                                        ? widget.idleMoney - amtToInsert
+                                        : widget.idleMoney + amtToInsert);
 
                                 setState(
                                   () {
@@ -543,7 +564,7 @@ class _AccountantBodyState extends State<AccountantBody> {
                                   },
                                 );
                               },
-                              child: const Text('INSERT'),
+                              child: Text(isInserting ? 'INSERT' : 'EXTRACT'),
                             ),
                             TextButton(
                               onPressed: () {
