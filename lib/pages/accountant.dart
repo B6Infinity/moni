@@ -12,9 +12,11 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:moni/db/nodes_databse.dart';
 import 'package:moni/model/node.dart';
+import 'package:moni/utils/constants.dart';
 import 'package:moni/utils/controllers.dart';
 import 'package:moni/utils/methods.dart';
 import 'package:moni/widgets/accountant_body.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Accountant extends StatefulWidget {
   const Accountant({super.key});
@@ -24,7 +26,9 @@ class Accountant extends StatefulWidget {
 }
 
 class _AccountantState extends State<Accountant> {
+  late SharedPreferences prefs;
   late NodesDatabase nodeDB;
+  late int idleMoney;
   late List<Node> NODES;
   bool isLoading = false;
 
@@ -34,6 +38,7 @@ class _AccountantState extends State<Accountant> {
 
     nodeDB = NodesDatabase.instance;
 
+    initSharedPref();
     refreshNodes();
   }
 
@@ -43,6 +48,12 @@ class _AccountantState extends State<Accountant> {
     NODES = await NodesDatabase.instance.readAllNodes();
 
     setState(() => isLoading = false);
+  }
+
+  Future initSharedPref() async {
+    prefs = await SharedPreferences.getInstance();
+
+    idleMoney = await prefs.getInt(idleMoney_ShPrefKEY)!;
   }
 
   @override
@@ -61,7 +72,10 @@ class _AccountantState extends State<Accountant> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : AccountantBody(NODES: NODES),
+          : AccountantBody(
+              NODES: NODES,
+              idleMoney: idleMoney,
+            ),
     );
   }
 

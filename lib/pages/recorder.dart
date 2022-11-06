@@ -2,9 +2,11 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:moni/db/flow_database.dart';
 import 'package:moni/db/nodes_databse.dart';
 import 'package:moni/model/Flow.dart';
@@ -27,6 +29,7 @@ class _RecorderState extends State<Recorder> {
   late var allNodes;
   var allFlows = [];
   late int liveMoney;
+  late int idleMoney;
 
   bool isBodyLoading = false;
 
@@ -52,8 +55,13 @@ class _RecorderState extends State<Recorder> {
       // Instantiate SharedPref
       await prefs.setInt(liveMoney_ShPrefKEY, 0);
     }
+    if (prefs.getInt(idleMoney_ShPrefKEY) == null) {
+      // Instantiate SharedPref
+      await prefs.setInt(idleMoney_ShPrefKEY, 0);
+    }
 
     liveMoney = prefs.getInt(liveMoney_ShPrefKEY)!;
+    idleMoney = prefs.getInt(idleMoney_ShPrefKEY)!;
   }
 
   void refreshData() async {
@@ -207,6 +215,34 @@ class _RecorderState extends State<Recorder> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
+            List<Widget> nodeRow = [];
+
+            for (var node in allNodes) {
+              nodeRow.add(
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                      padding: const EdgeInsets.all(8),
+                      height: 80,
+                      width: 80,
+                      color: colorFromHex(node.bg_color),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            node.name,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: colorFromHex(node.txt_color),
+                            ),
+                          ),
+                          Text('${node.present_amt}'),
+                        ],
+                      )),
+                ),
+              );
+            }
+
             return AlertDialog(
               title: Row(
                 children: [
@@ -246,6 +282,28 @@ class _RecorderState extends State<Recorder> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
+                  Container(
+                      child: isIncome
+                          ? null
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 20, bottom: 8),
+                                  child: Text(
+                                    'From',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: nodeRow,
+                                  ),
+                                ),
+                              ],
+                            )),
                   ListTile(
                     contentPadding: EdgeInsets.only(top: 8, bottom: 8),
                     title: Text(
@@ -297,6 +355,7 @@ class _RecorderState extends State<Recorder> {
                     // INCOME -> Add to liveMoney
                     if (isIncome) {
                       liveMoney += createdFlow.amt;
+                      idleMoney += liveMoney;
                     } else {
                       // EXPENDITURE -> Deduct from Node and Live Money
 
@@ -304,6 +363,7 @@ class _RecorderState extends State<Recorder> {
                     }
 
                     await prefs.setInt(liveMoney_ShPrefKEY, liveMoney);
+                    await prefs.setInt(idleMoney_ShPrefKEY, idleMoney);
                     // CLEAN UP
 
                     // ignore: use_build_context_synchronously
