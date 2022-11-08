@@ -425,7 +425,7 @@ class _AccountantBodyState extends State<AccountantBody> {
                   builder: (context) {
                     bool isInserting = true;
                     return StatefulBuilder(
-                      builder: (context, setState) {
+                      builder: (context, setDialogState) {
                         return AlertDialog(
                           title: GestureDetector(
                             child: Text(
@@ -440,7 +440,7 @@ class _AccountantBodyState extends State<AccountantBody> {
                               } else {
                                 isInserting = true;
                               }
-                              setState(
+                              setDialogState(
                                 () {},
                               );
                             },
@@ -557,6 +557,9 @@ class _AccountantBodyState extends State<AccountantBody> {
                                         ? widget.idleMoney - amtToInsert
                                         : widget.idleMoney + amtToInsert);
 
+                                setDialogState(
+                                  () {},
+                                );
                                 setState(
                                   () {
                                     idleMoney_inputcontroller__AMT.text = '';

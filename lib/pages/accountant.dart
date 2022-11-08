@@ -10,6 +10,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:moni/db/flow_database.dart';
 import 'package:moni/db/nodes_databse.dart';
 import 'package:moni/model/node.dart';
 import 'package:moni/utils/constants.dart';
@@ -67,7 +68,9 @@ class _AccountantState extends State<Accountant> {
         title: const Text('Accountant'),
         backgroundColor: Colors.black54,
         actions: [
-          IconButton(onPressed: createNode, icon: const Icon(Icons.add))
+          IconButton(onPressed: createNode, icon: const Icon(Icons.add)),
+          IconButton(
+              onPressed: exportData, icon: const Icon(Icons.upload_file)),
         ],
       ),
       body: isLoading
@@ -274,6 +277,54 @@ class _AccountantState extends State<Accountant> {
               ],
             );
           },
+        );
+      },
+    );
+  }
+
+  void exportData() async {
+    var data = '';
+
+    // Create JSONS
+    data += 'NODES_:\n';
+    for (var node in NODES) {
+      data = '$data\n${(node.toJson())}';
+    }
+
+    var FLOWS = await FlowDatabase.instance.readAllFlows();
+
+    data += '\n\nFLOWS_:\n';
+
+    for (var flow in FLOWS) {
+      data = '$data\n${(flow.toJson())}';
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'Export Data...',
+          ),
+          content: Container(
+            height: 300,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Theme.of(context).primaryColor,
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(8),
+              child: Text(data),
+            ),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () async {
+                await Clipboard.setData(ClipboardData(text: data));
+              },
+              icon: Icon(Icons.copy),
+            ),
+          ],
         );
       },
     );
