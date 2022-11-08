@@ -321,6 +321,8 @@ class _AccountantState extends State<Accountant> {
             IconButton(
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: data));
+                showSnackBarMSG(context, 'DATA copied to clipboard');
+                Navigator.pop(context);
               },
               icon: Icon(Icons.copy),
             ),

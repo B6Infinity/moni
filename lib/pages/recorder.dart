@@ -373,10 +373,12 @@ class _RecorderState extends State<Recorder> {
                     }
 
                     // IF EXPENDITURE ---------
-                    Node? node2deductFrom =
-                        await NodesDatabase.instance.readNode(activeNode!);
+                    Node? node2deductFrom;
 
                     if (!isIncome) {
+                      node2deductFrom =
+                          await NodesDatabase.instance.readNode(activeNode!);
+
                       if (activeNode == null) {
                         showSnackBarMSG(context, 'Select a node...');
                         return;
