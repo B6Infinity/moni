@@ -124,51 +124,83 @@ class _RecorderState extends State<Recorder> {
                   width: double.infinity,
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(30),
-                          bottomRight: Radius.circular(30),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (liveMoney > 0)
-                                ? Colors.green[800]!
-                                : Colors.red[800]!,
-                            blurRadius: 5,
-                            offset: Offset(0, 10),
-                          )
-                        ]),
-                    child: Center(
-                      child: Text(
-                        '₹ ${NumberFormat.decimalPattern('en_us').format(liveMoney)}',
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w700,
-                          color: (liveMoney > 0) ? Colors.green : Colors.red,
-                          // shadows: [
-                          //   Shadow(
-                          //     color: Colors.green,
-                          //     blurRadius: 20,
-                          //     offset: Offset(2, 2),
-                          //   ),
-                          //   Shadow(
-                          //     color: Colors.green,
-                          //     blurRadius: 20,
-                          //     offset: Offset(-2, -2),
-                          //   ),
-                          //   Shadow(
-                          //     color: Colors.green,
-                          //     blurRadius: 20,
-                          //     offset: Offset(4, 4),
-                          //   ),
-                          //   Shadow(
-                          //     color: Colors.green,
-                          //     blurRadius: 20,
-                          //     offset: Offset(-4, -4),
-                          //   ),
-                          // ],
-                        ),
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(30),
+                        bottomRight: Radius.circular(30),
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (liveMoney > 0)
+                              ? Colors.green[800]!
+                              : Colors.red[800]!,
+                          blurRadius: 5,
+                          offset: Offset(0, 10),
+                        )
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              '₹ ${NumberFormat.decimalPattern('en_us').format(liveMoney)}',
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.w700,
+                                color:
+                                    (liveMoney > 0) ? Colors.green : Colors.red,
+                                // shadows: [
+                                //   Shadow(
+                                //     color: Colors.green,
+                                //     blurRadius: 20,
+                                //     offset: Offset(2, 2),
+                                //   ),
+                                //   Shadow(
+                                //     color: Colors.green,
+                                //     blurRadius: 20,
+                                //     offset: Offset(-2, -2),
+                                //   ),
+                                //   Shadow(
+                                //     color: Colors.green,
+                                //     blurRadius: 20,
+                                //     offset: Offset(4, 4),
+                                //   ),
+                                //   Shadow(
+                                //     color: Colors.green,
+                                //     blurRadius: 20,
+                                //     offset: Offset(-4, -4),
+                                //   ),
+                                // ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        //   children: [
+                        //     RichText(
+                        //       text: TextSpan(
+                        //         children: [
+                        //           WidgetSpan(
+                        //             child: Icon(Icons.monetization_on),
+                        //           ),
+                        //           TextSpan(text: '20'),
+                        //         ],
+                        //       ),
+                        //     ),
+                        //     RichText(
+                        //       text: TextSpan(
+                        //         children: [
+                        //           WidgetSpan(child: Icon(Icons.wallet)),
+                        //           TextSpan(text: '20'),
+                        //         ],
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                      ],
                     ),
                   ),
                 ),
